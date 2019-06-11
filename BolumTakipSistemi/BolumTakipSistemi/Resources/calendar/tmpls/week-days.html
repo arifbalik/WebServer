@@ -1,0 +1,40 @@
+﻿<td style ="border: 1px solid lightgray;">
+
+</td>
+<% _.each(days_name, function(name) { %>
+<td style="border: 1px solid lightgray;">
+
+    <div id="cal-day-panel" class="clearfix">
+        <div id="cal-day-panel-hour">
+            <% for(i = 0; i < hours; i++){ %>
+            <div class="cal-day-hour">
+                <% for(l = 0; l < cal._hour_min(i); l++){ %>
+                <div class="row-fluid cal-day-hour-part">
+                    <div class="span1 col-xs-1"><b><%= cal._hour(i, l) %></b></div>
+                    <div class="span11 col-xs-11"></div>
+                </div>
+                <% }; %>
+            </div>
+            <% }; %>
+        </div>
+
+        <% _.each(by_hour, function(event){ %>
+
+
+
+        <div class="pull-left day-event day-highlight dh-<%= event['class'] %>" style="margin-top: <%= (event.top * 30) %>px; height: <%= (event.lines * 30) %>px">
+
+            <span class="cal-hours"><%= event.start_hour %> - <%= event.end_hour %></span>
+            <a href="javascript:editSchedule(<%= event.id %>)" data-event-id="<%= event.id %>"
+               data-event-class="<%= event['class'] %>" class="event-item">
+                <%= event.title %>
+            </a>
+        </div>
+
+        <% }); %>
+    </div>
+
+</td>
+<% start.setDate(start.getDate() + 1); %>
+<% idx++; %>
+<% }) %>

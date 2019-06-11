@@ -1,0 +1,396 @@
+﻿
+@{
+    ViewBag.Title = "BolumList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+}
+
+
+<script>
+
+    var iOperation = 0;
+    var iClassID = 0;
+    var iAjax = 0;
+
+    $(function () {
+
+
+        $('#btnNew').click(function () {
+
+            iOperation = 1;
+            iClassID = 0;
+            $('#txtClassName').val('');
+
+            $('#editRow').fadeIn(500);
+
+            setTimeout(function () {
+                $('#txtClassName').focus();
+
+            }, 600);
+
+        });
+
+
+
+        $('#editRow').hide();
+
+        $("#txtClassName").on("keydown", function (event) {
+            if (event.which == 13) {
+                doSave();
+
+            }
+            else if (event.which == 27) {
+                Cancel();
+
+            }
+
+        });
+
+        $("#txtStartTime").on("keydown", function (event) {
+            if (event.which == 13) {
+                doSave();
+
+            }
+            else if (event.which == 27) {
+                Cancel();
+
+            }
+
+        });
+
+
+        $("#txtEndTime").on("keydown", function (event) {
+            if (event.which == 13) {
+                doSave();
+
+            }
+            else if (event.which == 27) {
+                Cancel();
+
+            }
+
+        });
+
+        LoadData();
+
+
+    });
+
+    function Cancel()
+    {
+        iOperation = 0;
+        $('#editRow').fadeOut(500);
+        $('#txtClassName').val('');
+    }
+
+    function doSave() {
+
+        var strClassName = $('#txtClassName').val();
+
+        if (!strClassName || strClassName.length == 0) {
+            notifyE('Please Enter Class Name');
+            $('#txtClassName').focus();
+            return;
+        }
+
+        var strStart = $('#txtStartTime').val();
+        if(strStart.length > 0 && strStart.length != 5)
+        {
+            notifyE('Please Enter valid time');
+            $('#txtStartTime').focus();
+            return;
+            
+        }
+
+        var strEnd = $('#txtEndTime').val();
+        if (strEnd.length > 0 && strEnd.length != 5) {
+            notifyE('Please Enter valid time');
+            $('#txtEndTime').focus();
+            return;
+
+        }
+
+        if (iAjax == 1) return;
+
+        var params = {
+            "Operation": iOperation,
+            "ClassID": iClassID,
+            "ClassName": strClassName,
+            "WorkDay": $('#cmbWorkDay').val(),
+            "StartTime": strStart,
+            "EndTime": strEnd
+
+        };
+
+        iAjax = 1;
+
+        $.ajax({
+            type: "GET",
+            url: "/Student/SaveClass/",
+            data: params,
+            success: function (msg) {
+                var str = parseInt(msg);
+                if (str > 0) {
+                    iAjax = 0;
+                    $('#txtClassName').val('');
+                    LoadData();
+                    if (iOperation == 2) {
+                        $('#editRow').fadeOut(100);
+
+                    }
+
+                }
+                
+
+
+            },
+            error: function (request, status, error) {
+                iAjax = 0;
+            }
+
+        });
+
+
+    }
+
+    function LoadData() {
+
+        $.ajax({
+            type: "GET",
+            url: "/Student/ClassListAll/",
+            success: function (response) {
+                var dtList = response.data;
+                var strBody = '';
+
+                for (var i = 0; i < dtList.length; i++) {
+                    var iWorkDay = dtList[i].WorkDay;
+                    var strDay = '';
+
+                    if (iWorkDay == 1) {
+                        strDay = 'Monday';
+
+                    }
+                    else if (iWorkDay == 2)
+                    {
+                        strDay = 'Tuesday';
+
+                    }
+                    else if (iWorkDay == 3)
+                    {
+                        strDay = 'Wednesday';
+
+                    }
+                    else if (iWorkDay == 4) {
+                        strDay = 'Thursday';
+
+
+                    }
+                    else if (iWorkDay == 5) {
+                        strDay = 'Friday';
+
+                    }
+                    else if (iWorkDay == 6) {
+                        strDay = 'Saturday';
+
+                    }
+                    else if (iWorkDay == 7) {
+                        strDay = 'Sunday';
+
+                    }
+
+                    var strRow = '<tr>' +
+                                 '<td>' + dtList[i].ClassID + '</td>' +
+                                 '<td>' + dtList[i].ClassName + '</td>' +
+                                 '<td>' + strDay + '</td>' +
+                                 '<td>' + dtList[i].StartTime + '</td>' +
+                                 '<td>' + dtList[i].EndTime + '</td>' +
+
+                                 '<td style="cursor:pointer;" onclick="javascript:EditClass(this);" data-id="' + dtList[i].ClassID + '" data-bolum="' + dtList[i].ClassName + '" >  Edit</td>' +
+                                 '<td style="cursor:pointer;" onclick="javascript:DeleteClass(this);" data-id="' + dtList[i].ClassID + '"> Delete </td>' +
+                                 '</tr>';
+
+                    strBody += strRow;
+
+                }
+                $('#tableBolumList tbody').html(strBody);
+
+            },
+            error: function (request, status, error) {
+
+            }
+
+        });
+
+    }
+
+
+    function EditClass(itm)
+    {
+        var id = $(itm).attr('data-id');
+        var bolum = $(itm).attr('data-bolum');
+
+        iOperation = 2;
+        iClassID = id;
+
+        $('#txtClassName').val(bolum);
+        //$('#modalEdit').modal('show');
+        $('#editRow').fadeIn(1000);
+        setTimeout(function () {
+            $('#txtClassName').focus();
+
+        }, 500);
+
+
+    }
+
+    function DeleteClass(itm)
+    {
+        var id = $(itm).attr('data-id');
+
+        if (iAjax == 1) return;
+        var params = { "ClassID": id };
+        iAjax = 1;
+
+        $.ajax({
+            type: "GET",
+            url: "/Student/DeleteClass/",
+            data: params,
+            success: function (msg) {
+
+                iAjax = 0;
+
+                var str = parseInt(msg);
+                if (str > 0) {
+
+                    LoadData();
+                    notifyS('Class Deleted');
+
+                }
+                else if (str == -1) {
+
+                }
+            },
+            error: function (request, status, error) {
+                iAjax = 0;
+
+            }
+
+        });
+
+    }
+
+
+</script>
+
+<div style="padding-top:1px;">
+
+    <div class="portlet light form-fit bordered" style="">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-pointer font-green"></i>
+                <span class="caption-subject font-green bold uppercase">Class Records</span>
+            </div>
+        
+        </div>
+
+        <div class="portlet-body form">
+
+            <div class="form-body">
+
+                <div>
+
+                    <div style="margin:10px;">
+                        <button id="btnNew" class="defult btn btn-default">New</button>
+
+                    </div>
+
+                </div>
+
+                <table id="tableBolumList" class="table table-striped table-bordered table-hover dt-responsive">
+
+                    <thead>
+                        <tr class="gridHeader">
+                            <td style="width:80px;">Class No</td>
+                            <td>Class Name</td>
+                            <td>Day</td>
+                            <td>Start Time</td>
+                            <td>End Time</td>
+
+
+                             <td style="width:80px;"></td>
+                            <td style="width:150px;"></td>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<style>
+    #editRow {
+        float:left;
+        width:850px;
+        position:absolute;
+        left:10px;
+        top:144px;
+
+
+    }
+
+</style>
+
+<div id="editRow">
+    
+    <div class="row" style="width:100%;">
+
+
+        <div class="col-sm-3" style="margin-left: 0px; padding-left: 10px; padding-right: 0px; ">
+            <input id="txtClassName" onkeyup="this.value = this.value.toUpperCase()" style="width:250px" class="form-control" type="text" />
+
+        </div>
+
+        <div class="col-sm-3" style="margin-left: 0px; padding-left: 10px; padding-right: 0px; ">
+
+            <select class="form-control" data-size="8" id="cmbWorkDay">
+                <option value="1">Monday</option>
+                <option value="2">Tuesday</option>
+                <option value="3">Wednesday</option>
+                <option value="4">Thursday</option>
+                <option value="5">Friday</option>
+                <option value="6">Saturday</option>
+                <option value="7">Sunday</option>
+
+            </select>
+
+        </div>
+
+        <div class="col-sm-3" style="margin-left: 0px; padding-left: 10px; padding-right: 0px; ">
+            <input id="txtStartTime" onkeyup="this.value = this.value.toUpperCase()" placeholder="09:00" style="width:250px" class="form-control" type="text" />
+
+        </div>
+
+        <div class="col-sm-3" style="margin-left: 0px; padding-left: 10px; padding-right: 0px; ">
+            <input id="txtEndTime" onkeyup="this.value = this.value.toUpperCase()" style="width:250px" placeholder="18:00" class="form-control" type="text" />
+
+        </div>
+
+    </div>
+
+
+    @*<button type="button" style="width:120px;float:left;" id="btnSave1" class="btn green-sharp btn-outline">Kaydet</button>
+    <button type="button" style="width: 120px; float: left;" id="btnCancel1" class="btn green-sharp btn-outline">İptal</button>*@
+
+
+</div>
+
+

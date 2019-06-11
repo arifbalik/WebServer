@@ -1,0 +1,68 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+}
+
+
+
+<script>
+
+
+    $(function () {
+
+
+        $('#btnBolum').click(function () {
+            window.location = "/Student/ClassList";
+
+        });
+
+        $('#btnKisi').click(function () {
+            window.location = "/Student/StudentList";
+
+        });
+
+        $('#btnGiris').click(function () {
+            window.location = "/Student/Entrance";
+
+        });
+
+        $('#btnRapor').click(function () {
+            window.location = "/Student/EntranceReport";
+
+        });
+
+    });
+
+</script>
+
+
+<div class="row" style="width:95%;">
+
+    <div class="col-sm-2" style="">
+
+    </div>
+    
+    <div class="col-sm-2" style="padding-top:25px;margin-right:20px;">
+        <button type="button" style="width:250px;" id="btnBolum" class="btn btn-primary">Class Records</button>
+
+    </div>
+
+    <div class="col-sm-2" style="padding-top:25px;margin-right:20px;">
+        <button type="button" style="width:250px;" id="btnKisi" class="btn btn-primary">Student Records</button>
+
+    </div>
+
+    <div class="col-sm-2" style="padding-top:25px;margin-right:20px;">
+        <button type="button" style="width:250px;" id="btnGiris" class="btn btn-primary">Simulator </button>
+
+    </div>
+
+    <div class="col-sm-2" style="padding-top:25px;margin-right:20px;">
+        <button type="button" style="width:250px;" id="btnRapor" class="btn btn-primary">Report </button>
+
+    </div>
+
+
+</div>

@@ -1,0 +1,372 @@
+﻿
+@{
+    ViewBag.Title = "StudentList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+}
+
+
+<script>
+
+    var iOperation = 0;
+    var iStudentID = 0;
+    var iAjax = 0;
+
+    $(function () {
+
+        $('#editRow').hide();
+
+        $("#txtStudentName").on("keydown", function (event) {
+            if (event.which == 13) {
+                doSave1();
+
+            }
+            else if (event.which == 27) {
+                Cancel1();
+
+            }
+
+        });
+
+        $("#txtCardNumber").on("keydown", function (event) {
+            if (event.which == 13) {
+                doSave1();
+
+            }
+            else if (event.which == 27) {
+                Cancel1();
+
+            }
+
+        });
+
+        $("#cmbClassID").on("keydown", function (event) {
+            if (event.which == 13) {
+                doSave1();
+
+            }
+            else if (event.which == 27) {
+                Cancel1();
+
+            }
+
+        });
+
+        LoadData();
+
+        $('#btnNew').click(function () {
+
+            iOperation = 1;
+            iStudentID = 0;
+            $('#txtStudentName').val('');
+            $('#txtCardNumber').val('');
+            $('#cmbClassID').val(0);
+
+            $('#editRow').fadeIn(500);
+
+            setTimeout(function () {
+                $('#cmbClassID').focus();
+                $('#cmbClassID').trigger('open');
+
+            }, 600);
+
+        });
+
+        $('#btnSave').click(function () {
+
+            doSave();
+
+        });
+
+   
+
+    });
+
+    function Cancel1() {
+        $('#editRow').fadeOut(1000);
+        iOperation = 0;
+        $('#txtStudentName').val('');
+        $('#txtCardNumber').val('');
+        $('#cmbClassID').val(0);
+    }
+
+
+    function doSave1() {
+
+        var strStudentName = $('#txtStudentName').val();
+        var strCardNumber = $('#txtCardNumber').val();
+        var iClassID = $('#cmbClassID').val();
+
+        if (!iClassID || iClassID.length == 0) {
+            notifyE('Please Select Class');
+            $('#cmbClassID').focus();
+            return;
+        }
+
+        if (strStudentName.length == 0)
+        {
+            notifyE('Please Enter Student Name');
+            $('#txtStudentName').focus();
+
+            return;
+        }
+
+        if (strCardNumber.length == 0) {
+            notifyE('Please Enter Card Number');
+            $('#txtStudentName').focus();
+            return;
+        }
+
+
+        if (iAjax == 1) return;
+
+        var params = {
+            "Operation": iOperation,
+            "StudentID": iStudentID,
+            "ClassID": iClassID,
+            "StudentName": strStudentName,
+            "CardNumber": strCardNumber
+
+        };
+
+        iAjax = 1;
+
+        $.ajax({
+            type: "GET",
+            url: "/Student/SaveStudent/",
+            data: params,
+            success: function (msg) {
+                var str = parseInt(msg);
+                if (str > 0) {
+                    iAjax = 0;
+                    $('#txtCardNumber').val('');
+                    $('#txtStudentName').val('');
+                    $('#txtCardNumber').focus();
+
+                    if (iOperation == 2)
+                    {
+                        $('#editRow').fadeOut(100);
+
+                    }
+                    LoadData();
+
+                }
+
+            },
+            error: function (request, status, error) {
+                iAjax = 0;
+            }
+
+        });
+
+
+    }
+
+    function LoadData() {
+
+        $.ajax({
+            type: "GET",
+            url: "/Student/StudentListAll/",
+            success: function (response) {
+                var dtList = response.data;
+                var strBody = '';
+
+                for (var i = 0; i < dtList.length; i++) {
+
+                    var strRow = '<tr>' +
+                                 '<td>' + dtList[i].ClassName + '</td>' +
+                                 '<td>' + dtList[i].CardNumber + '</td>' +
+                                 '<td>' + dtList[i].StudentName + '</td>' +
+                                 '<td style="cursor:pointer;" onclick="javascript:EditKisi(this);" data-id="' + dtList[i].StudentID + '"  data-kartno="' + dtList[i].CardNumber + '" data-bolumid="' + dtList[i].ClassID + '" data-kisi="' + dtList[i].StudentName + '" >  Edit</td>' +
+                                 '<td style="cursor:pointer;" onclick="javascript:DeleteKisi(this);" data-id="' + dtList[i].StudentID + '"> Delete </td>' +
+                                 '</tr>';
+
+                    strBody += strRow;
+
+                }
+                $('#tableKisiList tbody').html(strBody);
+
+            },
+            error: function (request, status, error) {
+
+            }
+
+        });
+
+    }
+
+    function EditKisi(itm) {
+        var id = $(itm).attr('data-id');
+
+        var Kisi = $(itm).attr('data-kisi');
+        var kartno = $(itm).attr('data-kartno');
+        var bolumid = $(itm).attr('data-bolumid');
+
+        iOperation = 2;
+        iStudentID = id;
+
+        $('#txtStudentName').val(Kisi);
+        $('#txtCardNumber').val(kartno);
+        $('#cmbClassID').val(bolumid);
+        
+        $('#editRow').fadeIn(500);
+
+        setTimeout(function () {
+            $('#txtCardNumber').focus();
+
+        },500);
+
+    }
+
+    function DeleteKisi(itm) {
+
+        //onay almak gerekebilir.
+        var id = $(itm).attr('data-id');
+
+        if (iAjax == 1) return;
+        var params = { "StudentID": id };
+        iAjax = 1;
+
+        $.ajax({
+            type: "GET",
+            url: "/Student/DeleteStudent/",
+            data: params,
+            success: function (msg) {
+
+                iAjax = 0;
+
+
+                var str = parseInt(msg);
+                if (str > 0) {
+
+                    LoadData();
+                    notifyS('Stundent Deleted');
+
+                }
+                else if (str == -1) {
+
+                }
+            },
+            error: function (request, status, error) {
+                iAjax = 0;
+
+            }
+
+        });
+
+
+    }
+
+
+</script>
+
+<div style="padding-top:1px;">
+
+    <div class="portlet light form-fit bordered" style="">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-pointer font-green"></i>
+                <span class="caption-subject font-green bold uppercase">Student Records</span>
+            </div>
+        </div>
+
+        <div class="portlet-body form">
+
+            <div class="form-body">
+
+                <div>
+
+                    <div style="margin:10px;">
+
+                        <button id="btnNew" class="defult btn btn-default">New</button>
+
+
+
+                    </div>
+
+                </div>
+
+                <table id="tableKisiList" class="table table-striped table-bordered table-hover dt-responsive">
+
+                    <thead>
+                        <tr class="gridHeader">
+                            <td style="width:202px;">Class </td>
+                            <td style="width:202px;">Card No </td>
+                            <td style="width:250px;">Student</td>
+                            <td style="width:80px;"></td>
+                            <td style="width:150px;"></td>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+    #editRow {
+        float: left;
+        width: 1400px;
+        position: absolute;
+        left: 10px;
+        top: 144px;
+    }
+</style>
+
+
+
+<div id="editRow">
+
+
+    <div class="row" style="width:100%;">
+              
+        <div class="col-sm-3" style="margin-left: 0px; padding-left: 10px; padding-right: 0px; ">
+
+            <select class="form-control" data-size="8" id="cmbClassID" >
+                @if (ViewBag.BolumListOk)
+                {
+                    <option value="0"></option>
+
+                    foreach (System.Data.DataRow dr in ((System.Data.DataTable)ViewBag.BolumList).Rows)
+                    {
+                        <option value="@dr["ClassID"]">@dr["ClassName"]</option>
+
+                    }
+
+                }
+
+            </select>
+
+        </div>
+
+        <div class="col-sm-3" style="margin-left: 0px; padding-left: 0px;padding-right:0px;">
+            <input id="txtCardNumber" class="form-control" type="text" placeholder="Card No" />
+
+
+        </div>
+
+
+        <div class="col-sm-4" style="margin-left:0px;padding-left:0px;">
+            <input id="txtStudentName" onkeyup="this.value = this.value.toUpperCase()" class="form-control" type="text" placeholder="Name LastName" />
+
+
+        </div>
+
+
+    </div>
+</div>
+
+
+
+
+

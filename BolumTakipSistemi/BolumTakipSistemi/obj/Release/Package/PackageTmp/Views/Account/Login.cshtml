@@ -1,0 +1,311 @@
+﻿
+@model Pdks.Classes.LoginUserModel
+@{
+    ViewBag.Title = "Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+
+    <script src="~/AppScripts/defaults.js" type="text/javascript"></script>
+
+    <link href="~/Resources/googlefont.css" rel="stylesheet" type="text/css" />
+
+    <!-- BEGIN GLOBAL MANDATORY STYLES -->
+    <link href="~/Resources/metronic/assets/global/plugins/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Resources/metronic/assets/global/plugins/simple-line-icons/simple-line-icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Resources/metronic/assets/global/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Resources/metronic/assets/global/plugins/uniform/css/uniform.default.css" rel="stylesheet" type="text/css" />
+    <link href="~/Resources/metronic/assets/global/plugins/bootstrap-switch/css/bootstrap-switch.min.css" rel="stylesheet" type="text/css" />
+    <!-- END GLOBAL MANDATORY STYLES -->
+    <!-- BEGIN PAGE LEVEL PLUGINS -->
+    <link href="~/Resources/metronic/assets/global/plugins/bootstrap-select/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
+    <!-- END PAGE LEVEL PLUGINS -->
+    <!-- BEGIN THEME GLOBAL STYLES -->
+    <link href="~/Resources/metronic/assets/global/css/components-rounded.min.css" rel="stylesheet" id="style_components" type="text/css" />
+    <link href="~/Resources/metronic/assets/global/css/plugins.min.css" rel="stylesheet" type="text/css" />
+    <!-- END THEME GLOBAL STYLES -->
+    <!-- BEGIN THEME LAYOUT STYLES -->
+    <link href="~/Resources/metronic/assets/layouts/layout/css/layout.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Resources/metronic/assets/layouts/layout/css/themes/darkblue.min.css" rel="stylesheet" type="text/css" id="style_color" />
+    <link href="~/Resources/metronic/assets/layouts/layout/css/custom.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Resources/metronic/assets/global/plugins/bootstrap-touchspin/bootstrap.touchspin.css" rel="stylesheet" type="text/css" />
+    <link href="~/Resources/metronic/assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet" type="text/css" />
+
+
+    <link href="~/Resources/metronic/assets/global/plugins/select2/css/select2.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Resources/metronic/assets/global/plugins/select2/css/select2-bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Resources/metronic/assets/global/plugins/datatables/datatables.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Resources/metronic/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
+    <link href="~/Resources/metronic/assets/global/plugins/bootstrap-toastr/toastr.min.css" rel="stylesheet" type="text/css" />
+    @*<link href="~/Resources/global/plugins/bootstrap-toastr/toastr.min.css" rel="stylesheet" />*@
+    <link href="~/Resources/sitestyles.css" rel="stylesheet" />
+
+    <script src="~/Resources/metronic/assets/global/plugins/bootstrap-toastr/toastr.min.js"></script>
+    @*<script src="~/Resources/metronic/assets/global/plugins/bootstrap-toastr/ui-toastr.min.js"></script>*@
+
+
+    <script src="~/Resources/metronic/assets/global/plugins/jquery.min.js" type="text/javascript"></script>
+
+
+</head>
+
+<script>
+
+    $(function () {
+
+        var valErr = $('#iResult').val();
+
+        if (valErr.length > 0)
+        {
+            //  alert('valErr : ' + valErr);
+            notifyE(valErr);
+
+
+
+        }
+
+    });
+</script>
+
+<style>
+
+    #snackbar {
+        width: 80%;
+        height: 120px;
+        visibility: hidden;
+        min-width: 250px;
+        margin-left: -125px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 2px;
+        padding: 16px;
+        position: fixed;
+        z-index: 19991;
+        left: 17%;
+        bottom: 30px;
+        font-size: 25px;
+    }
+
+    #snackbar.show {
+        visibility: visible;
+        -webkit-animation: fadein 0.5s,fadeout 0.5s 2.5s;
+        animation: fadein 1.8s,fadeout 0.5s 2.5s;
+    }
+
+    #snackbar.hide {
+        visibility: hidden;
+        animation: fadeout 0.5s 2.5s;
+        -webkit-animation: fadeout 0.5s;
+    }
+
+
+    @@-webkit-keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @@-keyframes fadein {
+        from {
+            bottom: 0;
+            opacity: 0;
+        }
+
+        to {
+            bottom: 30px;
+            opacity: 1;
+        }
+    }
+
+    @@-webkit-keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+
+    @@-keyframes fadeout {
+        from {
+            bottom: 30px;
+            opacity: 1;
+        }
+
+        to {
+            bottom: 0;
+            opacity: 0;
+        }
+    }
+
+    body#LoginForm {
+        background-image: url("https://hdwallsource.com/img/2014/9/blur-26347-27038-hd-wallpapers.jpg");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        padding: 10px;
+    }
+
+    .form-heading {
+        color: #fff;
+        font-size: 23px;
+    }
+
+    .panel h2 {
+        color: #444444;
+        font-size: 18px;
+        margin: 0 0 8px 0;
+    }
+
+    .panel p {
+        color: #777777;
+        font-size: 14px;
+        margin-bottom: 30px;
+        line-height: 24px;
+    }
+
+    .login-form .form-control {
+        background: #f7f7f7 none repeat scroll 0 0;
+        border: 1px solid #d4d4d4;
+        border-radius: 4px;
+        font-size: 14px;
+        height: 50px;
+        line-height: 50px;
+    }
+
+    .main-div {
+        background: #ffffff none repeat scroll 0 0;
+        border-radius: 2px;
+        margin: 10px auto 30px;
+        max-width: 38%;
+        padding: 50px 70px 70px 71px;
+    }
+
+    .login-form .form-group {
+        margin-bottom: 10px;
+    }
+
+    .login-form {
+        text-align: center;
+    }
+
+    .forgot a {
+        color: #777777;
+        font-size: 14px;
+        text-decoration: underline;
+    }
+
+    .login-form .btn.btn-primary {
+        background: #f0ad4e none repeat scroll 0 0;
+        border-color: #f0ad4e;
+        color: #ffffff;
+        font-size: 14px;
+        width: 100%;
+        height: 50px;
+        line-height: 50px;
+        padding: 0;
+    }
+
+    .forgot {
+        text-align: left;
+        margin-bottom: 30px;
+    }
+
+    .botto-text {
+        color: #ffffff;
+        font-size: 14px;
+        margin: auto;
+    }
+
+    .login-form .btn.btn-primary.reset {
+        background: #ff9900 none repeat scroll 0 0;
+    }
+
+    .back {
+        text-align: left;
+        margin-top: 10px;
+    }
+
+        .back a {
+            color: #444444;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+</style>
+
+<div id="snackbar">
+    <div style="width:100%;height:100%;line-height:100%;" id="txt"></div>
+
+
+</div>
+
+<body id="LoginForm">
+    <input type="hidden" id="iResult" value="@ViewBag.Result" />
+
+    <div class="container">
+        <div class="login-form">
+            <div class="main-div">
+                <div class="panel">
+                    <h2>User Login</h2>
+                    <p>Please enter your email and password</p>
+                </div>
+                
+                @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", id = "frmSubmit", role = "form" }))
+                {
+                    @Html.AntiForgeryToken()
+
+                   <div class="form-group">
+                        
+                       @*@Html.LabelFor(m => m.Username, new { @class = "col-md-12  text-left color " })*@
+                       @Html.TextBoxFor(m => m.Username,  new { @class = "form-control placeholder-no-fix itmuser" })
+                       @Html.ValidationMessageFor(m => m.Username)
+
+
+
+                    </div>
+                    <div class="form-group">
+                        @*@Html.LabelFor(m => m.Password, new { @class = "col-md-12  text-left color" })*@
+                        @Html.PasswordFor(m => m.Password, new { @class = "form-control form-control-solid placeholder-no-fix" })
+                        @Html.ValidationMessageFor(m => m.Password)
+
+
+                    </div>
+                    <div class="forgot">
+                        @*<a href="reset.html">Forgot password?</a>*@
+                        @Html.CheckBoxFor(m => m.RememberMe)
+                        @Html.LabelFor(m => m.RememberMe, new { @class = "control-label" })
+
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                    
+                }
+
+                 
+            </div>
+            <p class="botto-text"></p>
+        </div>
+
+    </div>
+
+</body>
+
+
+</html>

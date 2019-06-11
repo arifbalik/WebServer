@@ -1,0 +1,12 @@
+﻿
+@{
+    ViewBag.Title = "ShowPDF";
+
+    Layout = null;
+    
+    
+}
+
+<input type="hidden" value="@ViewBag.Filename" />
+
+<object data="@ViewBag.Filename" type="application/pdf" style="min-height:100vh;width:100%"></object>

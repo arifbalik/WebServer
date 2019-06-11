@@ -1,0 +1,14 @@
+<span id="cal-slide-tick" style="display: none"></span>
+<div id="cal-slide-content" class="cal-event-list">
+	<ul class="unstyled list-unstyled">
+		<% _.each(events, function(event) { %>
+        <li class="<%= event.isold?'dwopacity':'' %> ">
+            <span class="pull-left event <%= event['class'] %> approved<%=event.ApprovedInt%> "></span>&nbsp;
+            <a href="javascript:editSchedule(<%= event.id %>)" data-event-id="<%= event.id %>"
+               data-event-class="<%= event['class'] %>" class="event-item">
+                <%= event.start_hour %> - <%= event.end_hour %> / <%= event.roomName %> : <%= event.title %>
+            </a>
+        </li>
+		<% }) %>
+	</ul>
+</div>

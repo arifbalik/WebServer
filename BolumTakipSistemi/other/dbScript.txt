@@ -1,0 +1,393 @@
+USE [Pdks]
+GO
+/****** Object:  Table [dbo].[tbBolum]    Script Date: 15.04.2019 11:49:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tbBolum](
+	[BolumID] [int] IDENTITY(1,1) NOT NULL,
+	[BolumAdi] [nvarchar](50) NULL,
+	[Created] [datetime] NULL,
+ CONSTRAINT [PK_tbBolum] PRIMARY KEY CLUSTERED 
+(
+	[BolumID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+/****** Object:  Table [dbo].[tbHareket]    Script Date: 15.04.2019 11:49:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tbHareket](
+	[HareketID] [bigint] IDENTITY(1,1) NOT NULL,
+	[PersonelID] [int] NULL,
+	[HareketDate] [date] NULL,
+	[Created] [datetime] NULL,
+ CONSTRAINT [PK_tbHareket] PRIMARY KEY CLUSTERED 
+(
+	[HareketID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+/****** Object:  Table [dbo].[tbPersonel]    Script Date: 15.04.2019 11:49:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[tbPersonel](
+	[PersonelID] [int] IDENTITY(1,1) NOT NULL,
+	[BolumID] [int] NULL,
+	[KartNo] [nvarchar](50) NULL,
+	[PersonelAdi] [nvarchar](50) NULL,
+	[Created] [datetime] NULL,
+ CONSTRAINT [PK_tbPersonel] PRIMARY KEY CLUSTERED 
+(
+	[PersonelID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+ALTER TABLE [dbo].[tbBolum] ADD  CONSTRAINT [DF_tbBolum_Created]  DEFAULT (getdate()) FOR [Created]
+GO
+ALTER TABLE [dbo].[tbHareket] ADD  CONSTRAINT [DF_tbHareket_PersonelID]  DEFAULT ((0)) FOR [PersonelID]
+GO
+ALTER TABLE [dbo].[tbHareket] ADD  CONSTRAINT [DF_tbHareket_Created]  DEFAULT (getdate()) FOR [Created]
+GO
+ALTER TABLE [dbo].[tbPersonel] ADD  CONSTRAINT [DF_tbPersonel_BolumID]  DEFAULT ((0)) FOR [BolumID]
+GO
+ALTER TABLE [dbo].[tbPersonel] ADD  CONSTRAINT [DF_tbPersonel_Created]  DEFAULT (getdate()) FOR [Created]
+GO
+/****** Object:  StoredProcedure [dbo].[BolumDelete]    Script Date: 15.04.2019 11:49:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[BolumDelete]
+@pBolumID		INT
+
+AS
+BEGIN
+	
+	
+
+
+	DELETE FROM tbBolum  
+	WHERE BolumID = @pBolumID
+
+	SELECT 1 AS Done
+
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[BolumInsert]    Script Date: 15.04.2019 11:49:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[BolumInsert]
+@pBolumAdi		NVARCHAR(50)
+
+AS
+BEGIN
+	
+	INSERT tbBolum 
+	(
+		BolumAdi
+
+	) 
+	VALUES 
+	(
+		@pBolumAdi
+	)
+
+	SELECT SCOPE_IDENTITY() AS BolumID
+
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[BolumList]    Script Date: 15.04.2019 11:49:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[BolumList]
+
+AS
+BEGIN
+	
+	SELECT * FROM   tbBolum  ORDER BY BolumAdi
+
+
+
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[BolumUpdate]    Script Date: 15.04.2019 11:49:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[BolumUpdate]
+@pBolumID		INT,
+@pBolumAdi		NVARCHAR(50)
+
+AS
+BEGIN
+	
+	UPDATE  tbBolum  SET 
+		BolumAdi = @pBolumAdi
+	WHERE BolumID = @pBolumID
+
+	SELECT @pBolumID AS BolumID
+
+
+
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[GirisListDate]    Script Date: 15.04.2019 11:49:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[GirisListDate]
+@pBolumID		INT,
+@pDate			DATE
+
+AS
+BEGIN
+	
+
+	SELECT tbHareket.HareketID, tbHareket.PersonelID, tbHareket.HareketDate, tbHareket.Created, tbPersonel.PersonelAdi, tbPersonel.KartNo, tbBolum.BolumAdi, tbBolum.BolumID,
+	CONVERT(NVARCHAR(50), tbHareket.Created,104) AS CreatedFormated
+	FROM     tbHareket LEFT OUTER JOIN
+	tbPersonel ON tbHareket.PersonelID = tbPersonel.PersonelID LEFT OUTER JOIN
+	tbBolum ON tbPersonel.BolumID = tbBolum.BolumID
+	WHERE tbPersonel.BolumID = @pBolumID AND tbHareket.HareketDate = @pDate ORDER BY Created
+
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[GirisListDateAll]    Script Date: 15.04.2019 11:49:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+CREATE PROCEDURE [dbo].[GirisListDateAll]
+@pBolumID		INT,
+@pDate			DATE
+
+AS
+BEGIN
+
+	
+	
+	SELECT tbPersonel.PersonelAdi, tbPersonel.KartNo, tbHareket.HareketDate, tbHareket.Created, tbBolum.BolumAdi,
+	tbBolum.BolumID, CONVERT(NVARCHAR(50), tbHareket.Created, 104)  	+ ' ' + CONVERT(NVARCHAR(50), tbHareket.Created, 108) AS CreatedFormated,
+	tbBolum.BolumID,  CONVERT(NVARCHAR(50), tbHareket.Created, 108) AS CreatedFormatedTime
+
+	FROM  tbPersonel LEFT OUTER JOIN
+	tbBolum ON tbPersonel.BolumID = tbBolum.BolumID LEFT OUTER JOIN
+	tbHareket ON tbPersonel.PersonelID = tbHareket.PersonelID AND tbPersonel.BolumID =  @pBolumID   AND tbHareket.HareketDate = @pDate
+	ORDER BY tbHareket.Created
+
+	--SELECT tbHareket.HareketID, tbHareket.PersonelID, tbHareket.HareketDate, tbHareket.Created, tbPersonel.PersonelAdi, tbPersonel.KartNo, tbBolum.BolumAdi, 
+	--tbBolum.BolumID, CONVERT(NVARCHAR(50), tbHareket.Created, 104)  	+ ' ' + CONVERT(NVARCHAR(50), tbHareket.Created, 108) AS CreatedFormated
+	--FROM     tbBolum INNER JOIN
+	--tbPersonel ON tbBolum.BolumID = tbPersonel.BolumID LEFT OUTER JOIN
+	--tbHareket ON tbPersonel.PersonelID = tbHareket.PersonelID
+	--WHERE (tbPersonel.BolumID = @pBolumID  OR tbPersonel.BolumID = 0) AND (( tbHareket.HareketDate = @pDate) OR (tbHareket.HareketDate IS NULL))
+	--ORDER BY Created
+
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[PersonelDelete]    Script Date: 15.04.2019 11:49:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+CREATE PROCEDURE [dbo].[PersonelDelete]
+@pPersonelID		INT
+
+AS
+BEGIN
+	
+	
+
+
+	DELETE FROM tbPersonel  
+	WHERE PersonelID = @pPersonelID
+
+	SELECT 1 AS Done
+
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[PersonelInsert]    Script Date: 15.04.2019 11:49:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+CREATE PROCEDURE [dbo].[PersonelInsert]
+@pBolumID			INT,
+@pKartNo			NVARCHAR(50),
+@pPersonelAdi		NVARCHAR(50)
+
+
+AS
+BEGIN
+	
+	INSERT tbPersonel 
+	(
+		BolumID,
+		KartNo,
+		PersonelAdi
+
+	) 
+	VALUES 
+	(
+		@pBolumID,
+		@pKartNo,
+		@pPersonelAdi
+	)
+
+	SELECT SCOPE_IDENTITY() AS PersonelID
+
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[PersonelList]    Script Date: 15.04.2019 11:49:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE PROCEDURE [dbo].[PersonelList]
+
+AS
+BEGIN
+	
+	SELECT tbPersonel.PersonelID, tbPersonel.BolumID, tbPersonel.KartNo, tbPersonel.PersonelAdi, tbPersonel.Created, tbBolum.BolumAdi
+	FROM     tbPersonel LEFT OUTER JOIN
+	tbBolum ON tbPersonel.BolumID = tbBolum.BolumID
+
+
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[PersonelUpdate]    Script Date: 15.04.2019 11:49:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+CREATE PROCEDURE [dbo].[PersonelUpdate]
+@pPersonelID		INT,
+@pBolumID			INT,
+@pKartNo			NVARCHAR(50),
+@pPersonelAdi		NVARCHAR(50)
+
+
+AS
+BEGIN
+	
+	UPDATE tbPersonel  SET
+	
+		BolumID = @pBolumID,
+		KartNo = @pKartNo ,
+		PersonelAdi = @pPersonelAdi
+	WHERE PersonelID = @pPersonelID
+
+	SELECT @pPersonelID AS PersonelID
+
+
+
+END
+
+GO
+/****** Object:  StoredProcedure [dbo].[ReadBarcode]    Script Date: 15.04.2019 11:49:29 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+CREATE PROCEDURE [dbo].[ReadBarcode]
+@pBolumID		INT,
+@pKartNo		NVARCHAR(50)
+
+
+AS
+BEGIN
+	
+	
+
+	DECLARE @pCount INT
+	DECLARE @pPersonelID INT
+
+	SELECT @pCount  = COUNT(PersonelID) FROM tbPersonel WHERE BolumID = @pBolumID AND KartNo = @pKartNo
+	SELECT @pPersonelID  = PersonelID FROM tbPersonel WHERE BolumID = @pBolumID AND KartNo = @pKartNo
+
+	IF(@pCount  > 0 )
+	BEGIN
+		--bulundu
+		--bu güne ait kaydý var mý
+
+		SET @pCount = 0
+		SELECT @pCount = COUNT(PersonelID) FROM tbHareket WHERE PersonelID = @pPersonelID AND HareketDate =  CAST(GETDATE() AS DATE)
+		IF(@pCount > 0)
+		BEGIN
+			SELECT -2 AS Done
+
+		END
+		ELSE
+		BEGIN
+			INSERT tbHareket 
+			(
+				PersonelID,
+				HareketDate
+
+			) 
+			VALUES 
+			(
+				@pPersonelID,
+				GETDATE()
+			
+			)
+
+			SELECT SCOPE_IDENTITY() AS Done
+
+		END
+
+	END
+	ELSE
+	BEGIN
+		SELECT -1 AS Done
+	END
+
+END
+
+GO

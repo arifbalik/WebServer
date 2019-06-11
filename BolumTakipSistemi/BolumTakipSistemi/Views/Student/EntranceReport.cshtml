@@ -1,0 +1,339 @@
+﻿
+@{
+    ViewBag.Title = "Report";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+}
+
+
+<script src="~/Resources/jspdf.debug.js"></script>
+@*<script src="examples/mitubachi-normal.js"></script>*@
+@*https://github.com/simonbengtsson/jsPDF-AutoTable*@
+
+@*<script src="~/Resources/faker.min.js"></script>*@
+<script src="~/Resources/jspdf.plugin.autotable.js"></script>
+
+<script>
+
+    var iPrinted = 0;
+    var iTriggerPDF = 0;
+
+
+    function formate(date) {
+        if (typeof date == "string")
+            date = new Date(date);
+        var day = (date.getDate() <= 9 ? "0" + date.getDate() : date.getDate());
+        var month = (date.getMonth() + 1 <= 9 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1));
+        var dateString = day + "" + month + "" + date.getFullYear() + "" + date.getHours() + "" + date.getMinutes();
+
+        return dateString;
+    }
+
+
+    $(function () {
+
+
+        //$('#').before()
+        //$('#frmPDF').on('submit', function () {
+
+        //    var doc = new jsPDF();
+        //    doc.autoTable({ html: '#tableGirisList' });
+        //    var blob = doc.output('blob');
+
+        //    var formData = new FormData();
+        //    formData.append('pdf', blob);
+        //    formData.append('filename', filename);
+
+        //    var formData = new FormData(form);
+
+        //    formData.append('file', file);
+
+        //    var xhr = new XMLHttpRequest();
+        //    // Add any event handlers here...
+        //    xhr.open('POST', form.getAttribute('action'), true);
+        //    xhr.send(formData);
+
+           
+
+        //    $(this).append('pdf', blob);
+
+
+        //});
+
+
+        $('#btnPDF').click(function () {
+
+            if (iPrinted == 0)
+            {
+                iTriggerPDF = 1;
+                LoadData();
+                return;
+
+            }
+           
+            PrintPDF();
+
+
+
+        });
+
+        $('#btnLoad').click(function () {
+
+            LoadData();
+
+        });
+
+        $('.date-picker').datepicker({
+            orientation: "auto",
+            autoclose: true,
+            format: 'dd.mm.yyyy',
+            weekStart: 1
+
+        });
+
+        $('#dtmStartDate').val(getFormattedDate(new Date()));
+
+
+    });
+
+    function LoadData() {
+
+        var iClassID = $('#cmbClassID').val()
+        var dtmTarih = $('#dtmStartDate').val();
+
+
+        var params = {
+            "ClassID": iClassID,
+            "Tarih": dtmTarih
+        };
+
+        $.ajax({
+            type: "GET",
+            data: params,
+            url: "/Student/EntranceListDateAll/",
+            success: function (response) {
+                var dtList = response.data;
+                var strBody = '';
+
+                iPrinted = 1;
+
+                for (var i = 0; i < dtList.length; i++) {
+
+                    var strDurum = '';
+                    var strDurum2 = '';
+
+                    var strHareketDate = dtList[i].OperationDate;
+                    if (strHareketDate.length > 0)
+                    {
+                        strDurum2 = '<img src="/Resources/images/online.png" title="Attended" style="height:16px;width:16px;" border="0"/>';
+                        strDurum = 'Attended';
+
+                    }
+                    else
+                    {
+                        strDurum2 = '<img src="/Resources/images/offline.png" title="NotAttended" style="height:16px;width:16px;" border="0"/>';
+                        strDurum = 'Not Attended';
+                    }
+
+                    var strRow = '<tr>' +
+                                 '<td>' + strDurum2 + '</td>' +
+                                 '<td>' + strDurum + '</td>' +
+                                 '<td>' + dtList[i].ClassName + '</td>' +
+                                 '<td>' + dtList[i].StudentName + '</td>' +
+                                 '<td>' + dtList[i].CreatedFormatedTime + '</td>' +
+                                 '</tr>';
+
+                    strBody += strRow;
+
+                }
+
+                $('#tableGirisList tbody').html(strBody);
+
+                if (iTriggerPDF == 1)
+                {
+                    PrintPDF();
+
+                }
+            },
+            error: function (request, status, error) {
+
+            }
+
+        });
+
+
+    }
+
+
+    function PrintPDF()
+    {
+
+        var doc = new jsPDF();
+        // You can use html:
+        doc.autoTable({ html: '#tableGirisList' });
+
+        // Or JavaScript:
+        //doc.autoTable({
+        //    head: [['Name', 'Email', 'Country']],
+        //    body: [
+        //        ['David', 'david@example.com', 'Sweden'],
+        //        ['Castille', 'castille@example.com', 'Norway'],
+        //        // ...
+        //    ]
+        //});
+        var dtmNow = new Date();
+
+        var filename = formate(dtmNow);
+
+        //doc.save(filename + '.pdf');
+
+        var blob = doc.output('blob');
+        var formData = new FormData();
+
+        formData.append('pdf', blob);
+        formData.append('filename', filename);
+
+        $.ajax({
+            url: '/Student/SavePDF', // not an actual good naming 
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                //console.log(response)
+                var strResponse = response;
+                if (strResponse.length > 0) {
+                    iTriggerPDF = 0;
+                    window.location = 'ShowPDF?f=' + strResponse;
+
+
+                }
+
+            },
+            error: function (err) { console.log(err) }
+        });
+
+
+    }
+
+
+
+
+</script>
+
+
+<div class="row" style="width:95%;">
+
+    <div class="col-sm-12" style="padding:20px;">
+
+
+        <div class="portlet light form-fit bordered">
+            <div class="portlet-title" style="padding:0px;padding-left:10px;">
+                <div class="caption">
+                    <i class="icon-edit font-green"></i>
+                    <span class="caption-subject font-green bold uppercase">  Attendee Report</span>
+                </div>
+            </div>
+            <div class="portlet-body form">
+
+                <div class="form-body form-horizontal form-row-seperated">
+
+                    <div class="row" style="width:95%;">
+
+                        <div class="col-sm-2">
+
+                            <div class="form-group">
+
+                                <label for="cmbClassID" id="lbl3">Class</label>
+                                
+                                <select class="form-control" data-live-search="true" data-size="8" id="cmbClassID">
+
+                                    @if (ViewBag.BolumListOk)
+                                    {
+                                        <option value="0">All</option>
+                                        
+                                        foreach (System.Data.DataRow dr in ((System.Data.DataTable)ViewBag.BolumList).Rows)
+                                        {
+                                            <option value="@dr["ClassID"]">@dr["ClassName"]</option>
+
+                                        }
+
+                                    }
+                                    
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-sm-2">
+                            <div class="form-group">
+                                <label for="dtmStartDate" id="lbl3">Date</label>
+                                <input id="dtmStartDate" class="form-control date-picker" type="text" value="">
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-sm-2">
+                            <button type="button" style="width:150px;margin-top:35px;" id="btnLoad" class="btn btn-primary">Create Report</button>
+
+                        </div>
+
+                        <div class="col-sm-2">
+
+                            @*@using (Html.BeginForm("SavePDF", "PDKS", FormMethod.Post, new { enctype = "multipart/form-data", @data_ajax = "false", id = "frmPDF" }))
+                            {
+                                <button type="submit" style="" class="btn btn-default pull-right"> <span class="glyphicon glyphicon-export"></span>PDF  </button>
+                                <input type="hidden" name="txtExcelFilter" />
+                                <input type="hidden" name="cmboFilter" />
+
+
+                            }*@
+
+
+                            <button type="button" style="width: 150px; margin-top: 35px;" id="btnPDF" class="btn btn-primary">Export PDF</button>
+
+                        </div>
+
+
+
+                    </div>
+
+                    <div class="row" style="width:95%;height:auto; padding:20px;">
+
+                        <table id="tableGirisList" class="table table-striped table-bordered table-hover dt-responsive">
+
+                            <thead>
+                                <tr class="gridHeader">
+                                    <td style="width:35px;"> </td>
+                                    <td style="width:35px;">Statu </td>
+                                    <td style="width:135px;">Class </td>
+                                    <td style ="width:205px;">Student</td>
+                                    <td style ="width:135px;">Entry Time</td>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody></tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+  
+
+
+</div>

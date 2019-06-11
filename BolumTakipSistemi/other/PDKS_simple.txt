@@ -1,0 +1,22 @@
+- ana menü 4 tane button
+
+-Bölüm tanimlari
+-personel tanimlari
+-persenel girisleri
+-rapor günlük
+
+bölüm id bölümname
+
+personel kartno
+personel bölümü
+personel adi soyadi
+
+personel girisi
+
+bölüm seçilir
+kart numarasi okutulur, 
+kart numarasi varsa seçilen bölümdeyse, giris kabul edilir
+personel bilgileri getirilir, hareket tablosuna kayit atilir.
+
+rapor seçilen güne ait personellerin geldi gelmedi raporu
+pdf çiktisi alinir.

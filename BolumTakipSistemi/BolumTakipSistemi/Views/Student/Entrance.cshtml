@@ -1,0 +1,224 @@
+﻿
+@{
+    ViewBag.Title = "Simulator";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+}
+<script>
+
+    var iAjax = 0;
+
+    $(function () {
+
+        $("#txtCardNumber").on("keydown", function (event) {
+            if (event.which == 13) {
+                ReadBacode();
+
+            }
+
+        });
+
+        $("#cmbClassID").change(function () {
+
+            LoadData();
+            $('#txtCardNumber').focus();
+
+        });
+
+    });
+
+    function ReadBacode()
+    {
+
+        var iClassID = $('#cmbClassID').val();
+        var strCardNumber = $('#txtCardNumber').val();
+
+        if (iClassID == 0)
+        {
+            notifyE('Please select a class');
+            return;
+
+        }
+
+        var params = {
+            "ClassID": iClassID,
+            "CardNumber": strCardNumber
+
+        };
+
+        iAjax = 1;
+
+        $.ajax({
+            type: "GET",
+            url: "/Student/ReadBarkod/",
+            data: params,
+            success: function (msg) {
+                var str = parseInt(msg);
+                if (str > 0) {
+                    iAjax = 0;
+                    notifyS('Success');
+                    LoadData();
+                    $('#txtCardNumber').val('');
+
+                }
+                else if (str == -1)
+                {
+                    notifyE('No Records Found');
+                    $('#txtCardNumber').select();
+
+                }
+                else if (str == -2) {
+                    notifyE('Person Already Exists');
+                    $('#txtCardNumber').select();
+
+                }
+                else if (str == -3) {
+                    notifyE('Cannot enter this class at this time');
+                    $('#txtCardNumber').select();
+
+                }
+
+            },
+            error: function (request, status, error) {
+                iAjax = 0;
+            }
+
+        });
+
+    }
+
+    function LoadData()
+    {
+        var iClassID = $('#cmbClassID').val()
+        if (iClassID == 0)
+        {
+            $('#tableGirisList tbody').html('');
+            return;
+        } 
+
+
+        var dtmTarih = getFormattedDate(new Date());
+
+        var params = {
+            "ClassID": iClassID,
+            "Tarih":dtmTarih
+        };
+
+        $.ajax({
+            type: "GET",
+            data:params,
+            url: "/Student/EntranceListDate/",
+            success: function (response) {
+                var dtList = response.data;
+                var strBody = '';
+
+                for (var i = 0; i < dtList.length; i++) {
+
+                    var strRow = '<tr>' +
+                                 '<td>' + dtList[i].ClassName + '</td>' +
+                                 '<td>' + dtList[i].StudentName + '</td>' +
+                                 '<td>' + dtList[i].CreatedFormated + '</td>' +
+                                 '</tr>';
+
+                    strBody += strRow;
+
+                }
+
+                $('#tableGirisList tbody').html(strBody);
+
+            },
+            error: function (request, status, error) {
+
+            }
+
+        });
+
+        
+
+
+    }
+
+
+   
+
+</script>
+
+<div class="row" style="width:95%;">
+
+    <div class="col-sm-6" style="padding:20px;">
+
+
+        <div class="portlet light form-fit bordered" style="">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="icon-edit font-green"></i>
+                    <span class="caption-subject font-green bold uppercase"> Please Have Your Card Readed</span>
+                </div>
+            </div>
+            <div class="portlet-body form">
+
+                <div class="form-body form-horizontal form-row-seperated">
+
+                    <div class="form-group">
+                        <label class="control-label col-md-3">Select Class</label>
+                        <div class="col-md-4">
+                            <select class="form-control" data-live-search="true" data-size="8" id="cmbClassID">
+                                <option value="0"></option>
+                                
+                                @if (ViewBag.BolumListOk)
+                                {
+                                    foreach (System.Data.DataRow dr in ((System.Data.DataTable)ViewBag.BolumList).Rows)
+                                    {
+                                        <option value="@dr["ClassID"]">@dr["ClassName"]</option>
+                                    
+                                    }
+                                    
+                                }
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group">
+                        <label class="control-label">Read Card</label>
+                        <div class="">
+                            <input id="txtCardNumber" class="form-control" type="text" />
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <div class="col-sm-6" style="padding:20px;">
+        <table id="tableGirisList" class="table table-striped table-bordered table-hover dt-responsive">
+
+            <thead>
+                <tr class="gridHeader">
+                    <td>Class </td>
+                    <td>Student</td>
+                    <td>Date</td>
+
+                </tr>
+
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+
+
+    </div>
+
+
+</div>

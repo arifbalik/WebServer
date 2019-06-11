@@ -1,0 +1,76 @@
+﻿
+<table class="table">
+
+    <thead>
+        <tr>
+            <th class="col-sm-2">
+                Room Name<br /><small><span style="color:white;">..</span></small>
+            </th>
+
+            <% _.each(days_name, function(name) { %>
+
+            <th class="header1 col-sm-1" data-toggle="tooltip" title="<%= cal._getHolidayName(start2) %>">
+                <%= name %><br>
+                <small><span data-cal-date="<%= start2.getFullYear() %>-<%= start2.getMonthFormatted() %>-<%= start2.getDateFormatted() %>" data-cal-view="day"><%= start2.getDate() %> <%= cal.locale['ms' + start2.getMonth()] %></span></small>
+            </th>
+
+            <% start2.setDate(start2.getDate() + 1); %>
+            <% }) %>
+        </tr>
+    </thead>
+
+    <tbody>
+        <% _.each(rooms, function(room) { %>
+        <tr data-roomid="<%= room.RoomId %>">
+            <td>
+                <div class="cal-month-day cal-day-inmonth">
+                    <span class="center-align divLen" style="left:0;"><%= room.RoomName %></span>
+                </div>
+            </td>
+            <%= cal._week(room.RoomId) %>
+        </tr>
+        <% }) %>
+    </tbody>
+
+
+</table>
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+
+
+    $('.cal-month-day').mouseover(function () {
+        $(this).find(".addButton").show();
+
+    });
+
+    $('.addButton').click(function () {
+        //alert($(this).id);
+
+    });
+
+
+    $('.cal-month-day').mouseleave(function () {
+        $(this).find(".addButton").hide();
+
+    });
+
+    $('.addButton').hide();
+
+
+</script>
+
+<style type="text/css">
+    .header1 {
+        text-align: center;
+    }
+</style>

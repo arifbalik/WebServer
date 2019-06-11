@@ -1,0 +1,90 @@
+﻿<% _.each(days_name, function(name) { %>
+<td style="border: 1px solid lightgray;">
+    <% var eventCount = 0; %>
+    <% var itmDate; %>
+    <% var vDate = start.getFullYear() + '-'+ start.getMonthFormatted() + '-' + start.getDateFormatted(); %>
+   
+    <% _.each(events, function(event){ %>
+    <% if(event.start_day == idx){ %>
+    <% eventCount++; %>
+    <% itmDate = event.startDate1  %>
+    <% }}); %>
+    <div class="cal-month-day cal-day-inmonth">
+        <span class="center-align divLen" style="font-weight: bold; cursor: pointer;"><%= eventCount==0?'': eventCount %></span>
+
+        <button class="btn green addButton" data-itemlen="<%= events.length %>" data-cal-date="<%= vDate %>">+</button>
+
+    </div>
+  
+
+</td>
+<% start.setDate(start.getDate() + 1); %>
+<% idx++; %>
+<% }) %>
+
+
+
+<style>
+    .addButton {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+    }
+
+    .divLen {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        -webkit-transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        font-size: 22px;
+        color: rgba(43, 108, 80, 0.42);
+    }
+</style>
+
+<script>
+
+    $(function () {
+
+        $('.addButton').click(function () {
+
+
+        
+            var btn = $(this);
+            var tarih = btn.data('cal-date');
+            var row = $(this).closest("tr");
+            var date1 = $(this).closest("th");
+
+            var iSelectedRoom = row.data('roomid');
+            var date = new Date(tarih);
+            var dd = date.getDate();
+            var mm = date.getMonth() + 1;
+            var yyyy = date.getFullYear();
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+
+            if (mm < 10) {
+                mm = '0' + mm
+            }
+            var lastday = dd + '.' + mm + '.' + yyyy;
+            $('#spnDate').html(lastday);
+
+            $('#mySchedule').modal('show');
+
+            setTimeout(function () {
+                $('#txtSubject').focus();
+                if (iSelectedRoom > 0) {
+                    $("#cmbRoom").val(iSelectedRoom).change();
+
+                }
+
+            }, 250);
+
+
+        });
+
+    });
+
+</script>

@@ -1,0 +1,79 @@
+﻿<div id="cal-day-box" unselectable="on">
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th class="col-sm-1" style="width: 4%">
+                    Time<br /><small><span style="color:white;">..</span></small>
+                </th>
+
+                <% _.each(days_name, function(name) { %>
+
+                <th class="header1 col-sm-1" title="<%= cal._getHolidayName(start2) %>">
+                    <%= name %><br>
+                    <small><span data-cal-date="<%= start2.getFullYear() %>-<%= start2.getMonthFormatted() %>-<%= start2.getDateFormatted() %>"><%= start2.getDate() %> <%= cal.locale['ms' + start2.getMonth()] %></span></small>
+                </th>
+
+                <% start2.setDate(start2.getDate() + 1); %>
+                <% }) %>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="height: 960px;">
+                    <div id="cal-day-panel">
+                        <div id="cal-day-panel-hour">
+                            <% for(i = 0; i < hours; i++){ %>
+                            <div class="cal-day-hour">
+                                <% for(l = 0; l < cal._hour_min(i); l++){ %>
+                                <div class="row-fluid cal-day-hour-part" data-hour="<%= cal._hour(i, l) %>">
+                                    <div class="span1 col-xs-1"><b><%= cal._hour(i, l) %></b></div>
+                                    <div class="span11 col-xs-11"></div>
+                                </div>
+                                <% }; %>
+                            </div>
+                            <% }; %>
+                        </div>
+                    </div>
+                </td>
+                <% _.each(days_name, function(name) { %>
+                <td style="border: 1px solid lightgray;">
+
+                    <div id="cal-day-panel">
+
+                        <div id="cal-day-panel-hour">
+                            <% for(i = 0; i < hours; i++){ %>
+                            <div class="cal-day-hour">
+                                <% for(l = 0; l < cal._hour_min(i); l++){ %>
+                                <div class="row-fluid cal-day-hour-part" data-hour="<%= cal._hour(i, l) %>" data-daydate="<%= moment(start).format('YYYY-MM-DD') %>">
+                                    <div class="span11 col-xs-11"></div>
+                                </div>
+                                <% }; %>
+                            </div>
+                            <% }; %>
+                        </div>
+
+                        <% _.each(by_hour, function(event){ %>
+                        <% if(event.startx.getDate() == start.getDate()){%>
+                        <div class="pull-left day-event day-highlight dh-<%= event['class'] %> <%= event.isold?'dwopacity':'' %>" style="margin-top: <%= (event.top * 30) %>px; height: <%= (event.lines * 30) %>px" data-event-id="<%= event.id %>">
+
+                            <span class="cal-hours <%= event.isold?'':'fc-dragger' %>"><%= event.start_hour %> - <%= event.end_hour %></span>
+                            <a href="javascript:editSchedule(<%= event.id %>)" data-event-id="<%= event.id %>"
+                               data-event-class="<%= event['class'] %>" class="event-item">
+                                <%= event.title %>
+                            </a>
+                            <div class="<%= event.isold?'':'fc-resizer' %>"></div>
+                        </div>
+
+                        <% }}); %>
+                    </div>
+                </td>
+                <% start.setDate(start.getDate() + 1); %>
+                <% }) %>
+            </tr>
+        </tbody>
+
+
+    </table>
+
+</div>
